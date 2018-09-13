@@ -1,0 +1,29 @@
+.DesList {
+    width: 90%;
+}
+.LogoAmigoSpam {
+    background: #e4e5e6;
+    border-radius: 15px;
+    font-weight: bold;
+    letter-spacing: 2pt;
+    padding: 5px 1% 5px 1%;
+    margin: 0 0 0 -3%;
+    width: 7%;
+    position: relative;
+    left: -3%;
+}
+.navbar-brand{    
+    position: relative;
+    left: -3%;
+}
+.LogoAmigoDiv {
+    background: #2f353a;
+    color: white;
+    border-radius: 8px;
+    float: right;
+    letter-spacing: 1pt;
+    padding: 0px 7px 2px 7px;
+}
+.app-header .navbar-brand {
+    width: 130px;
+}
