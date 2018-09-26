@@ -439,7 +439,7 @@ const mainChartOpts = {
   },
 };
 
-class Dashboard extends Component {
+class EncuestasLista extends Component {
   constructor(props) {
     super(props);
 
@@ -451,8 +451,10 @@ class Dashboard extends Component {
       modal: false,
       OpenModalValid: false,
       radioSelected: 2,
+      IdElimiar : 0,
       ResulInter: "",
       result: [],
+      ValueDelete: 0,
       tooltipOpen: [false, false],
       ObjExcelCabecera : [],
       ObjExcelDetalle : [],
@@ -481,17 +483,19 @@ class Dashboard extends Component {
     this.toggle             =   this.toggle.bind(this);
     this.toggleTab          =   this.toggleTab.bind(this);
     this.AddEncuesta        =   this.AddEncuesta.bind(this);
-    this.EditEncuesta       =   this.EditEncuesta.bind(this);
     this.DeleteEncuesta     =   this.DeleteEncuesta.bind(this);
     this.RefreshEncuesta    =   this.RefreshEncuesta.bind(this);
     this.FileUploadChange   =   this.FileUploadChange.bind(this);  
     this.InsertaEncuesta    =   this.InsertaEncuesta.bind(this);  
+    this.EliminarEncuesta   =   this.EliminarEncuesta.bind(this);  
     this.RemplaceCabecera   =   this.RemplaceCabecera.bind(this); 
     this.RemplaDetalle      =   this.RemplaDetalle.bind(this); 
     this.RemplaceOpciones   =   this.RemplaceOpciones.bind(this);  
     this.CloseModalValid    =   this.CloseModalValid.bind(this);  
+    this.ActualizarLista    =   this.ActualizarLista.bind(this); 
+    this.CancelDelete       =   this.CancelDelete.bind(this); 
   }
-
+  
   toggleTab(tab) {
     if (this.state.activeTab !== tab) {
       this.setState({
@@ -500,6 +504,7 @@ class Dashboard extends Component {
     }
   }
   AddEncuesta() {
+    this.ActualizarLista();
     this.setState({
       danger: !this.state.danger,
       ObjExcelCabecera : [],
@@ -507,19 +512,49 @@ class Dashboard extends Component {
       ObjExcelOpcion : [],
     });
   }
+  ActualizarLista(){    
+    var config = {
+        headers: {  
+            'Access-Control-Allow-Origin': '*'
+        }, 
+        withCredentials : false, 
+        Credentials: true 
+      };
+    //axios.get(`http://red.lindley.pe/AmigoApi/api/CargaParametro/Listar`, config)
+    //axios.get(`http://10.145.220.77/AmigoApi/api/CargaParametro/Listar`, config)
+    axios.get(`http://localhost:51237/api/CargaParametro/Listar`, config)
+    //axios.get('https://jsonplaceholder.typicode.com/users', config)
+    .then(res => { 
+        const result = res.data.Data.Listas;
+        this.setState({ result });
+    })  
+    .catch(function (error) {
+        // handle error 
+        console.log(error);    
+    })
+  }
+
   CloseModalValid(){
     this.setState({OpenModalValid: false});
   }
-  EditEncuesta() {
-    this.setState({
-      danger: !this.state.danger,
-    });
-  }
 
-  DeleteEncuesta() {
-    this.setState({
-      danger: !this.state.danger,
-    });
+  DeleteEncuesta(event) 
+  {
+    //this.setState({result: this.state.result.filter(function(result) { 
+    //    return result !== ObjReturn
+    //})});
+    event.preventDefault();
+    const {  param } = event.target.dataset;
+    if(param == undefined){
+      this.DeleteEncuesta; 
+    }
+    else{
+      var result =  param
+      this.setState({
+        warning: !this.state.warning,
+        IdElimiar:result
+      });
+    }
   }
 
   RefreshEncuesta() {
@@ -542,35 +577,13 @@ class Dashboard extends Component {
       radioSelected: radioSelected,
     });
   }
-
-  componentDidMount() {
-    var config = {
-        headers: {  
-            'Access-Control-Allow-Origin': '*'
-        }, 
-        withCredentials : false, 
-        Credentials: true 
-      };
-    //axios.get(`http://red.lindley.pe/AmigoApi/api/CargaParametro/Listar`, config)
-    axios.get(`http://localhost:51237/api/CargaParametro/Listar`, config)
-    //axios.get('https://jsonplaceholder.typicode.com/users', config)
-    .then(res => { 
-        const result = res.data.Data.Listas;
-        this.setState({ result });
-    })  
-    .catch(function (error) {
-        // handle error 
-        console.log(error);    
-    })
+  
+  componentWillMount() {
+    this.ActualizarLista();
   } 
   FileUploadChange = (files) => {
       var asdas = files;
       const NomExcel = files[0].name;
-
-      //var Url = "http://red.lindley.pe/AmigoApi/api/CargaParametro/Listar";
-      //ExcelInsertData((Url,model)
-            
-      //this.setState({OpenModalValid: true});
       readXlsxFile(files[0]).then((rows) => {
           const ImpExcel = rows.filter(c => c["0"] != "SURCOD")
           this.setState({
@@ -601,17 +614,21 @@ class Dashboard extends Component {
         withCredentials : false, 
         Credentials: true 
     }
+    //var Url =  "http://red.lindley.pe/ACMLINDLEYAPI/api/AVANCEPEDIDO/CONSULTAGENERAL"; 
+    //var Url =  "http://red.lindley.pe/AmigoApi/api/CargaParametro/RegistrarEncuesta"; 
+    //var Url =  "http://10.145.220.77/AmigoApi/api/CargaParametro/RegistrarEncuesta"; 
     var Url =  "http://localhost:51237/api/CargaParametro/RegistrarEncuesta"; 
     var ObjCabecera = this.RemplaceCabecera(this.state.ObjExcelCabecera).replace("},]","}]");
     var ObjDetalle  = this.RemplaDetalle(this.state.ObjExcelDetalle).replace("},]","}]");
     var ObjOpcion   = this.RemplaceOpciones(this.state.ObjExcelOpcion).replace("},]","}]");
-    var data = {"Id_TempEncuesta": 10, "Str_Cabecera": ObjCabecera , "Str_Detallle": ObjDetalle, "Str_Opciones": ObjOpcion }
+    var data = {"List_TempEncuesta": "0", "Str_Cabecera": ObjCabecera , "Str_Detallle": ObjDetalle, "Str_Opciones": ObjOpcion }
+    //var data = {"LOCACION": "IC", "RUTA": "101" }
     axios.post(Url, data)
     .then(res => { 
-        const ResulInter = res.data.Data;
+        const ResulInter = res.data.Data.List_TempEncuesta;
         this.setState({ ResulInter });
         
-        this.AddEncuesta();
+        this.AddEncuesta(res.data.Data.Obj_Cabecera);
         this.setState({OpenModalValid: true});
     })  
     .catch(function (error) {
@@ -619,6 +636,32 @@ class Dashboard extends Component {
         console.log(error);    
     })
   } 
+  EliminarEncuesta() {
+    var config = {
+        headers: {  
+            'Access-Control-Allow-Origin': '*'
+        }, 
+        withCredentials : false, 
+        Credentials: true 
+    }
+    //var Url =  "http://red.lindley.pe/AmigoApi/api/CargaParametro/EliminarEncuesta"; 
+    var Url =  "http://localhost:51237/api/CargaParametro/EliminarEncuesta"; 
+    var data = {"Id_TempEncuesta": this.state.IdElimiar}
+    axios.post(Url, data)
+    .then(res => { 
+        const ResulInter = res.data.Data;
+        this.setState({warning: !this.state.warning});
+        this.ActualizarLista();
+    })  
+    .catch(function (error) {
+        // handle error 
+        console.log(error);    
+    })
+  } 
+
+  CancelDelete(){    
+    this.setState({warning: !this.state.warning});
+  }
   
   RemplaceCabecera(ObjExcel){       
     var i = 0; 
@@ -647,11 +690,12 @@ class Dashboard extends Component {
     var Sep = ""; 
     for(const i in ObjExcel){
         if( ObjExcel.length == 1){ Sep = "}" }else{ Sep = "}," }
-        string += ('{"SURCOD":' + ObjExcel[i][0] + ',"SURQSTNUM":"' + ObjExcel[i][1] + '"' + ',"SURCMBKEY":"' + ObjExcel[i][2] +  '","SURCMBDES":"' + ObjExcel[i][3] + '"' + Sep);
+        string += ('{"SURCOD":' + ObjExcel[i][0] + ',"SURQSTNUM":"' + ObjExcel[i][1] + '"' + ',"SURCMBKEY":"' + ObjExcel[i][2] +  '","SURCMBDES":"' + ObjExcel[i][3]  +  '","FORMAVAL":"' + ObjExcel[i][4] +  '","SIGUIENTE":"' + ObjExcel[i][5] + '"' + Sep);
     }			
     return ('['+string+']');
   }
   render() { 
+    const { ValueDelete } = this.state;
     var ClassExcel = null; 
     var ListExcel = [];
     ClassExcel  =   <Button  block outline color="secondary" aria-label="Plantilla Encuesta Excel">
@@ -672,7 +716,6 @@ class Dashboard extends Component {
                     <tr>
                     <th>#Id</th>
                     <th>Nombre Encuesta</th>
-                    <th></th>
                     <th>
                         {/* 
                         <Button  block outline color="secondary" aria-label="Plantilla Encuesta Excel" >
@@ -687,13 +730,17 @@ class Dashboard extends Component {
                             <Workbook.Sheet data={ListExcel} name="DETALLE">
                                 <Workbook.Column label="SURCOD"     value="name"  />
                                 <Workbook.Column label="SURQSTDES"  value="name"  />
+                                <Workbook.Column label="SURQSTNUM"  value="name"  />
                                 <Workbook.Column label="SURANSTYP"  value="name"  />
+                                <Workbook.Column label="CORRELATIVO"  value="name"  />
                             </Workbook.Sheet>
                             <Workbook.Sheet data={ListExcel} name="OPCIONES">
                                 <Workbook.Column label="SURCOD"     value="name"  />
                                 <Workbook.Column label="SURQSTNUM"  value="name"  />
                                 <Workbook.Column label="SURCMBKEY"  value="name"  />
                                 <Workbook.Column label="SURCMBDES"  value="name"  />
+                                <Workbook.Column label="FORMAVAL"   value="name"  />
+                                <Workbook.Column label="SIGUIENTE"  value="name"  />
                             </Workbook.Sheet>
                         </Workbook>
                     </th>
@@ -714,14 +761,17 @@ class Dashboard extends Component {
                         <tr key={p.IdSurveyItem}>
                             <td>{p.IdSurveyItem}</td>
                             <td className="DesList">{p.Description}</td>
-                            <td>
+                            {/* <td>
                                 <Button block outline color="warning" 
                                         onClick={this.EditEncuesta} className="mr-1">
                                     <i className="icon-note"></i>
                                 </Button>
-                            </td>
+                            </td> */}
                             <td>
-                                <Button block outline color="danger" 
+                                <Button block outline color="danger"
+                                        key={p.IdSurveyItem}
+                                        data-param={p.IdSurveyItem}
+                                        
                                         onClick={this.DeleteEncuesta} className="mr-1">
                                     <i className="icon-trash"></i>
                                 </Button>
@@ -819,6 +869,8 @@ class Dashboard extends Component {
                                         <th>SURQSTNUM</th>
                                         <th>SURCMBKEY</th>
                                         <th>SURCMBDES</th>
+                                        <th>FORMAVAL</th>
+                                        <th>SIGUIENTE</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -829,6 +881,8 @@ class Dashboard extends Component {
                                             <td>{o[1]}</td>
                                             <td>{o[2]}</td>
                                             <td>{o[3]}</td>
+                                            <td>{o[4]}</td>
+                                            <td>{o[5]}</td>
                                         </tr>                    
                                     )}           
                                     </tbody>   
@@ -846,10 +900,22 @@ class Dashboard extends Component {
                         className={'modal-success ' + this.props.className}>
                         <ModalHeader toggle={this.OpenModalValid}>Mensaje Encuesta</ModalHeader>
                         <ModalBody>   
-                            <div>Se Guardo Correcnamente la Encuesta  {this.state.ResulInter}</div>             
+                            <div>Se Guardo Correcnamente las Encuestas  {this.state.ResulInter}</div>             
                         </ModalBody> 
                         <ModalFooter>
                             <Button color="danger" onClick={this.CloseModalValid}>Cerrar</Button>
+                        </ModalFooter>
+                    </Modal> 
+                    
+                    <Modal isOpen={this.state.warning} toggle={this.OpenDeleteValid}
+                        className={'modal-danger ' + this.props.className}>
+                        <ModalHeader toggle={this.warning}>Eliminar Encuesta</ModalHeader>
+                        <ModalBody>   
+                            <div>Esta Seguro de querer Eliminar la Encuesta  {this.state.IdElimiar}</div>             
+                        </ModalBody> 
+                        <ModalFooter>
+                            <Button color="danger" onClick={this.CancelDelete}>Cancelar</Button>
+                            <Button color="success" onClick={this.EliminarEncuesta}>Enviar</Button>
                         </ModalFooter>
                     </Modal> 
                 </Table>
@@ -874,4 +940,4 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard;
+export default EncuestasLista;

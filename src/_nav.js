@@ -14,6 +14,7 @@ export default {
       url: '/Encuestas',
       icon: 'icon-note',
     },
+    /*
     {
       title: true,
       name: 'Theme',
@@ -260,7 +261,6 @@ export default {
         },
       ],
     },
-    /*
     {
       name: 'Download CoreUI',
       url: 'http://coreui.io/react/',
