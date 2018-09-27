@@ -520,9 +520,9 @@ class EncuestasLista extends Component {
         withCredentials : false, 
         Credentials: true 
       };
-    //axios.get(`http://red.lindley.pe/AmigoApi/api/CargaParametro/Listar`, config)
+    axios.get(`http://red.lindley.pe/AmigoApi/api/CargaParametro/Listar`, config)
     //axios.get(`http://10.145.220.77/AmigoApi/api/CargaParametro/Listar`, config)
-    axios.get(`http://localhost:51237/api/CargaParametro/Listar`, config)
+    //axios.get(`http://localhost:51237/api/CargaParametro/Listar`, config)
     //axios.get('https://jsonplaceholder.typicode.com/users', config)
     .then(res => { 
         const result = res.data.Data.Listas;
@@ -615,9 +615,9 @@ class EncuestasLista extends Component {
         Credentials: true 
     }
     //var Url =  "http://red.lindley.pe/ACMLINDLEYAPI/api/AVANCEPEDIDO/CONSULTAGENERAL"; 
-    //var Url =  "http://red.lindley.pe/AmigoApi/api/CargaParametro/RegistrarEncuesta"; 
+    var Url =  "http://red.lindley.pe/AmigoApi/api/CargaParametro/RegistrarEncuesta"; 
     //var Url =  "http://10.145.220.77/AmigoApi/api/CargaParametro/RegistrarEncuesta"; 
-    var Url =  "http://localhost:51237/api/CargaParametro/RegistrarEncuesta"; 
+    //var Url =  "http://localhost:51237/api/CargaParametro/RegistrarEncuesta"; 
     var ObjCabecera = this.RemplaceCabecera(this.state.ObjExcelCabecera).replace("},]","}]");
     var ObjDetalle  = this.RemplaDetalle(this.state.ObjExcelDetalle).replace("},]","}]");
     var ObjOpcion   = this.RemplaceOpciones(this.state.ObjExcelOpcion).replace("},]","}]");
@@ -644,8 +644,8 @@ class EncuestasLista extends Component {
         withCredentials : false, 
         Credentials: true 
     }
-    //var Url =  "http://red.lindley.pe/AmigoApi/api/CargaParametro/EliminarEncuesta"; 
-    var Url =  "http://localhost:51237/api/CargaParametro/EliminarEncuesta"; 
+    var Url =  "http://red.lindley.pe/AmigoApi/api/CargaParametro/EliminarEncuesta"; 
+    //var Url =  "http://localhost:51237/api/CargaParametro/EliminarEncuesta"; 
     var data = {"Id_TempEncuesta": this.state.IdElimiar}
     axios.post(Url, data)
     .then(res => { 
